@@ -17,21 +17,21 @@ const db = new pg.Client({
 });
 db.connect();
 
+let visitedCountriesCodes = [];
+
+db.query('SELECT country_code FROM visited_countries', (err, res) => {
+  if (err) {
+    console.log('Error executing query: ', err.stack);
+  } else {
+    const queryResult = res.rows;
+    console.log('query result: ', queryResult);
+
+    visitedCountriesCodes = queryResult.map(code => code.country_code);
+    console.log('visitedCountriesCodes: ', visitedCountriesCodes);
+  }
+});
+
 app.get('/', async (req, res) => {
-  let visitedCountriesCodes = [];
-
-  db.query('SELECT country_code FROM visited_countries', (err, res) => {
-    if (err) {
-      console.log('Error executing query: ', err.stack);
-    } else {
-      const queryResult = res.rows;
-      console.log('query result: ', queryResult);
-
-      visitedCountriesCodes = queryResult.map(code => code.country_code);
-      console.log('visitedCountriesCodes: ', visitedCountriesCodes);
-    }
-  });
-
   res.render('index.ejs', {
     countries: visitedCountriesCodes,
     total: visitedCountriesCodes.length,
