@@ -52,6 +52,6 @@ Navigate to http://localhost:3000 in your browser to play the game.
 
 ## Project Structure
 
-index.js: Main server file containing backend logic and database interactions.
-views/index.ejs: EJS template for the quiz frontend.
-public/styles/main.css: CSS file for frontend styling.
+- index.js: Main server file containing backend logic and database interactions.
+- views/index.ejs: EJS template for the quiz frontend.
+- public/styles/main.css: CSS file for frontend styling.
