@@ -4,7 +4,7 @@
 
 Travel Tracker is an engaging web application designed for users to track and visualize the countries they have visited. It leverages Express.js and PostgreSQL, incorporating external data files for comprehensive country information. The application features an interactive map interface, enabling users to dynamically update their travel records.
 
-![Travel Tracker](.public/images/application-screenshot.png)
+![Travel Tracker](./public/images/application-screenshot.png)
 
 ## Key Learnings
 
