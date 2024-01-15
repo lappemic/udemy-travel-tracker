@@ -17,25 +17,61 @@ const db = new pg.Client({
 });
 db.connect();
 
-let visitedCountriesCodes = [];
-
-db.query('SELECT country_code FROM visited_countries', (err, res) => {
-  if (err) {
-    console.log('Error executing query: ', err.stack);
-  } else {
-    const queryResult = res.rows;
-    console.log('query result: ', queryResult);
-
-    visitedCountriesCodes = queryResult.map(code => code.country_code);
-    console.log('visitedCountriesCodes: ', visitedCountriesCodes);
-  }
-});
-
 app.get('/', async (req, res) => {
+  const result = await db.query('SELECT country_code FROM visited_countries');
+  let visitedCountriesCodes = [];
+  result.rows.map(code => visitedCountriesCodes.push(code.country_code));
+
   res.render('index.ejs', {
     countries: visitedCountriesCodes,
     total: visitedCountriesCodes.length,
   });
+});
+
+app.post('/add', async (req, res) => {
+  // Get new Country input
+  const newCountry = req.body.country;
+
+  // Get all country Codes
+  const countryCodesResult = await db.query('SELECT id, country_code, country_name FROM countries');
+
+  // Get all visited Countries
+  const visitedCountriesResult = await db.query('SELECT country_code FROM visited_countries');
+  let visitedCountriesCodes = [];
+  visitedCountriesResult.rows.map(code => visitedCountriesCodes.push(code.country_code));
+
+  // Get the countryCode of the newCountry
+  let newCountryCode;
+
+  try {
+    // Get the countryCode of the newCountry
+    newCountryCode = countryCodesResult.rows.find(
+      country => country.country_name === newCountry
+    ).country_code;
+
+    if (!newCountryCode) {
+      throw new Error('Country code not found.');
+    }
+  } catch (error) {
+    // Handle the error
+    console.error('Error finding country code:', error);
+  }
+
+  // Check if the newCountryCode is already in the visitedCountriesCodes
+  try {
+    if (visitedCountriesCodes.includes(newCountryCode)) {
+      console.log('Country already exists');
+      res.redirect('/');
+    } else {
+      console.log('Country does not exist');
+      await db.query('INSERT INTO visited_countries (country_code) VALUES ($1)', [newCountryCode]);
+      res.redirect('/');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    // res.status(500).send('An error occurred');
+    res.redirect('/');
+  }
 });
 
 app.listen(port, () => {
